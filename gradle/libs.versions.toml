@@ -1,8 +1,8 @@
 [versions]
-compose-multiplatform = "1.10.2"        # https://github.com/JetBrains/compose-multiplatform/releases
+compose-multiplatform = "1.10.3"        # https://github.com/JetBrains/compose-multiplatform/releases
 compose-material3 = "1.10.0-alpha05"    # https://github.com/JetBrains/compose-multiplatform/releases
 compose-materialIcons = "1.7.3"         # https://mvnrepository.com/artifact/org.jetbrains.compose.material/material-icons-extended
-kotlin = "2.3.20"                       # https://kotlinlang.org/docs/releases.html
+kotlin = "2.3.21"                       # https://kotlinlang.org/docs/releases.html
 kotlinx-coroutines = "1.10.2"           # https://github.com/Kotlin/kotlinx.coroutines/releases
 pdfBox = "3.0.7"                        # https://pdfbox.apache.org/index.html
 

@@ -7,10 +7,6 @@ plugins {
 kotlin {
     jvm()
 
-    compilerOptions {
-        freeCompilerArgs.add("-Xcontext-parameters")
-    }
-
     sourceSets {
         commonMain.dependencies {
             implementation(libs.compose.runtime)
