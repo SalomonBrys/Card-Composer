@@ -156,3 +156,27 @@ Card(
     }
 )
 ```
+
+## Previewing and Exporting: `cardComposerApplication`
+
+Card Composer provides a built-in Compose Desktop application to preview your cards and export them to PNG or PDF.
+
+To use it, create a `main` function in your JVM target:
+
+```kotlin
+fun main() = cardComposerApplication(
+    title = "My Awesome Game",
+    cards = {
+        listOf(
+            myFirstCard,
+            mySecondCard,
+            // ...
+        )
+    }
+)
+```
+
+This will open a window where you can:
+- Browse through all your defined cards.
+- Toggle between light and dark mode for the UI.
+- Export all cards or specific groups to PNG or PDF using the export dialog.
