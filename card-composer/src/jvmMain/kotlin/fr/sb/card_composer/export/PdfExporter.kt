@@ -3,22 +3,35 @@ package fr.sb.card_composer.export
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import fr.sb.card_composer.Card
 import fr.sb.card_composer.CardFace
 import fr.sb.card_composer.CardSize
-import fr.sb.card_composer.PT_PER_MM
+import fr.sb.card_composer.Pt
+import fr.sb.card_composer.PtOffset
+import fr.sb.card_composer.PtSize
 import fr.sb.card_composer.backFace
 import fr.sb.card_composer.frontFace
 import fr.sb.card_composer.fullName
+import fr.sb.card_composer.mm
+import fr.sb.card_composer.pt
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -112,8 +125,8 @@ internal object PdfExporter : Exporter {
 
     }
 
-    private val A4_MM = Size(210f, 297f)
-    private val MARGIN_MM = 5
+    private val a4Size = PtSize(210.mm, 297.mm)
+    private val margin = 5.mm
 
     override fun export(cards: List<Card>): Flow<Exporter.Progress> =
         flow {
@@ -142,45 +155,36 @@ internal object PdfExporter : Exporter {
         cards: List<Card>,
     ): Flow<Exporter.Progress> =
         flow {
-            val pageSizeMm = when (orientation) {
-                Orientation.PORTRAIT -> Size(A4_MM.width, A4_MM.height)
-                Orientation.LANDSCAPE -> Size(A4_MM.height, A4_MM.width)
+            val pageSize = when (orientation) {
+                Orientation.PORTRAIT -> a4Size
+                Orientation.LANDSCAPE -> PtSize(a4Size.height, a4Size.width)
             }
-            val pageSafeSizeMm = Size(pageSizeMm.width - 2 * MARGIN_MM, pageSizeMm.height - 2 * MARGIN_MM)
+            val pageSafeSize = PtSize(pageSize.width - margin * 2, pageSize.height - margin * 2)
             val originalCardSize = cards.first().size
             val originalCardOrientation = if (CardSize.isPortrait(originalCardSize)) Orientation.PORTRAIT else Orientation.LANDSCAPE
             val rotate = forcePageOrientation && (orientation != originalCardOrientation)
-            val cardSizeMm =
-                if (rotate) Size(originalCardSize.height.value, originalCardSize.width.value)
-                else Size(originalCardSize.width.value, originalCardSize.height.value)
-            val cardsPerRow = floor(pageSafeSizeMm.width / cardSizeMm.width).toInt()
-            require(cardsPerRow > 0) { "$groupName's cards width is too large to fit on the requested page width (${pageSafeSizeMm.width})" }
-            val rowsPerPage = floor(pageSafeSizeMm.height / cardSizeMm.height).toInt()
-            require(rowsPerPage > 0) { "$groupName's cards height is too large to fit on the requested page width (${pageSafeSizeMm.height})" }
+            val cardSize =
+                if (rotate) PtSize(originalCardSize.height, originalCardSize.width)
+                else originalCardSize
+            val cardsPerRow = floor(pageSafeSize.width / cardSize.width).toInt()
+            require(cardsPerRow > 0) { "$groupName's cards width is too large to fit on the requested page width (${pageSafeSize.width.value} pt)" }
+            val rowsPerPage = floor(pageSafeSize.height / cardSize.height).toInt()
+            require(rowsPerPage > 0) { "$groupName's cards height is too large to fit on the requested page width (${pageSafeSize.height.value} pt)" }
 
-            val contentSizeMm = Size(
-                width = cardsPerRow * cardSizeMm.width,
-                height = rowsPerPage * cardSizeMm.height,
+            val contentSize = PtSize(
+                width = cardSize.width * cardsPerRow,
+                height = cardSize.height * rowsPerPage,
             )
-            val topLeftMm = Offset(
-                x = (pageSizeMm.width - contentSizeMm.width) / 2,
-                y = (pageSizeMm.height - contentSizeMm.height) / 2,
+            val topLeft = PtOffset(
+                x = (pageSize.width - contentSize.width) / 2,
+                y = (pageSize.height - contentSize.height) / 2,
             )
-            val topLeftPt = Offset(
-                x = topLeftMm.x * PT_PER_MM,
-                y = topLeftMm.y * PT_PER_MM,
-            )
-            val cardSizePt = Size(
-                width = cardSizeMm.width * PT_PER_MM,
-                height = cardSizeMm.height * PT_PER_MM,
-            )
-            val bleedSizePt = CardSize.standardSafeMargin.value * PT_PER_MM
             val pageFaceMaker = PageFaceMaker(
                 document = this@addGroupPages,
-                pageSizeMm = pageSizeMm,
-                topLeftPt = topLeftPt,
-                cardSizePt = cardSizePt,
-                bleedSizePt = bleedSizePt,
+                pageSize = pageSize,
+                topLeft = topLeft,
+                cardSize = cardSize,
+                bleedSize = CardSize.standardSafeMargin,
                 cardsPerRow = cardsPerRow,
                 rowsPerPage = rowsPerPage,
             )
@@ -214,10 +218,10 @@ internal object PdfExporter : Exporter {
 
     private class PageFaceMaker(
         val document: PDDocument,
-        val pageSizeMm: Size,
-        val topLeftPt: Offset,
-        val cardSizePt: Size,
-        val bleedSizePt : Float,
+        val pageSize: PtSize,
+        val topLeft: PtOffset,
+        val cardSize: PtSize,
+        val bleedSize : Pt,
         val cardsPerRow: Int,
         val rowsPerPage: Int,
     ) {
@@ -228,7 +232,7 @@ internal object PdfExporter : Exporter {
             withMarks: Boolean,
         ) {
             coroutineScope {
-                val page = PDPage(PDRectangle(pageSizeMm.width * PT_PER_MM, pageSizeMm.height * PT_PER_MM))
+                val page = PDPage(PDRectangle(pageSize.width.value, pageSize.height.value))
 
                 class Render(
                     val name: String,
@@ -268,43 +272,43 @@ internal object PdfExporter : Exporter {
                         row.forEachIndexed { cardIndex, render ->
                             val image = PDImageXObject.createFromByteArray(document, render.png.await(), "${render.name}.png")
 
-                            var x =
-                                if (invertX) topLeftPt.x + (cardsPerRow - cardIndex - 1) * cardSizePt.width
-                                else topLeftPt.x + cardIndex * cardSizePt.width
-                            var y = topLeftPt.y + (rowsPerPage - rowIndex - 1) * cardSizePt.height // Y is inverted on PDFs
+                            var x: Pt =
+                                if (invertX) topLeft.x + cardSize.width * (cardsPerRow - cardIndex - 1)
+                                else topLeft.x + cardSize.width * cardIndex
+                            var y: Pt = topLeft.y + cardSize.height * (rowsPerPage - rowIndex - 1) // Y is inverted on PDFs
 
-                            if (render.bleed.left) x -= bleedSizePt
-                            if (render.bleed.bottom) y -= bleedSizePt // Y is inverted on PDFs
+                            if (render.bleed.left) x -= bleedSize
+                            if (render.bleed.bottom) y -= bleedSize // Y is inverted on PDFs
 
-                            val width = cardSizePt.width + bleedSizePt * render.bleed.horizontalBleeds
-                            val height = cardSizePt.height + bleedSizePt * render.bleed.verticalBleeds
+                            val width: Pt = cardSize.width + bleedSize * render.bleed.horizontalBleeds
+                            val height: Pt = cardSize.height + bleedSize * render.bleed.verticalBleeds
 
-                            stream.drawImage(image, x, y, width, height)
+                            stream.drawImage(image, x.value, y.value, width.value, height.value)
                         }
                     }
 
                     if (withMarks) {
-                        stream.setLineWidth(0.5f * PT_PER_MM)
+                        stream.setLineWidth(0.5.mm.value)
                         stream.setStrokingColor(0.0f, 0.0f, 0.0f)
-                        val markLengthPt = 5 * PT_PER_MM
+                        val markLength = 5.mm
 
                         repeat(cardsPerRow + 1) {
-                            stream.moveTo(topLeftPt.x + it * cardSizePt.width, page.cropBox.upperRightY - topLeftPt.y + bleedSizePt)
-                            stream.lineTo(topLeftPt.x + it * cardSizePt.width, page.cropBox.upperRightY - topLeftPt.y + bleedSizePt + markLengthPt)
+                            stream.moveTo((topLeft.x + cardSize.width * it).value, (page.cropBox.upperRightY.pt - topLeft.y + bleedSize).value)
+                            stream.lineTo((topLeft.x + cardSize.width * it).value, (page.cropBox.upperRightY.pt - topLeft.y + bleedSize + markLength).value)
                             stream.stroke()
 
-                            stream.moveTo(topLeftPt.x + it * cardSizePt.width, topLeftPt.y - bleedSizePt)
-                            stream.lineTo(topLeftPt.x + it * cardSizePt.width, topLeftPt.y - bleedSizePt - markLengthPt)
+                            stream.moveTo((topLeft.x + cardSize.width * it).value, (topLeft.y - bleedSize).value)
+                            stream.lineTo((topLeft.x + cardSize.width * it).value, (topLeft.y - bleedSize - markLength).value)
                             stream.stroke()
                         }
 
                         repeat(rowsPerPage + 1) {
-                            stream.moveTo(topLeftPt.x - bleedSizePt, topLeftPt.y + it * cardSizePt.height)
-                            stream.lineTo(topLeftPt.x - bleedSizePt - markLengthPt, topLeftPt.y + it * cardSizePt.height)
+                            stream.moveTo((topLeft.x - bleedSize).value, (topLeft.y + cardSize.height * it).value)
+                            stream.lineTo((topLeft.x - bleedSize - markLength).value, (topLeft.y + cardSize.height * it).value)
                             stream.stroke()
 
-                            stream.moveTo(page.cropBox.upperRightX - topLeftPt.x + bleedSizePt, topLeftPt.y + it * cardSizePt.height)
-                            stream.lineTo(page.cropBox.upperRightX - topLeftPt.x + bleedSizePt + markLengthPt, topLeftPt.y + it * cardSizePt.height)
+                            stream.moveTo((page.cropBox.upperRightX.pt - topLeft.x + bleedSize).value, (topLeft.y + cardSize.height * it).value)
+                            stream.lineTo((page.cropBox.upperRightX.pt - topLeft.x + bleedSize + markLength).value, (topLeft.y + cardSize.height * it).value)
                             stream.stroke()
                         }
                     }

@@ -165,7 +165,7 @@ internal object PngExporter : Exporter {
         bleed: Bleed,
         rotation: Rotation?,
     ): ByteArray {
-        val density = Density(PIXEL_PER_MM, MM_PER_PT)
+        val density = Density(PIXEL_PER_MM)
         val fullCardSize = CardSize.fullSize(face.size)
         ImageComposeScene(
             width = (fullCardSize.width.value * PIXEL_PER_MM).roundToInt(),

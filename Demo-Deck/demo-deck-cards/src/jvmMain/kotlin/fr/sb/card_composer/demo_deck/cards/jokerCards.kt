@@ -1,6 +1,7 @@
 package fr.sb.card_composer.demo_deck.cards
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -53,6 +54,7 @@ fun jokerCards() =
                 contentDescription = null,
                 modifier = Modifier
                     .align(Alignment.Center)
+                    .fillMaxHeight(.6f)
                     .fillMaxWidth(.8f)
                     .then(color)
             )

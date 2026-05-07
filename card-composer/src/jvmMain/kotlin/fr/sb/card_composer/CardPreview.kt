@@ -57,7 +57,7 @@ internal fun CardPreview(
             val heightRatio = boxSize.height.toFloat() / fullCardSize.height.value
 
             CompositionLocalProvider(
-                LocalDensity provides Density(min(widthRatio, heightRatio), MM_PER_PT),
+                LocalDensity provides Density(min(widthRatio, heightRatio)),
                 CardTheme provides face.theme,
                 LocalCardSize provides face.size,
             ) {

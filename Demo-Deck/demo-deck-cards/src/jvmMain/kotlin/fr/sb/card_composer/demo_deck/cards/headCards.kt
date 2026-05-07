@@ -1,6 +1,7 @@
 package fr.sb.card_composer.demo_deck.cards
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +40,7 @@ fun headCards(): List<Card> = Suits.entries.flatMap { suit ->
                 modifier = Modifier
                     .align(Alignment.Center)
                     .fillMaxWidth(.8f)
+                    .fillMaxHeight(.55f)
             )
             listOf(
                 Modifier.align(Alignment.TopStart),

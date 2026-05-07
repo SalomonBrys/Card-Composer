@@ -1,0 +1,108 @@
+# Card Composer
+
+Card Composer is a library for creating and printing board game cards using Compose Desktop. It provides a specialized unit system for physical printing, a theme system tailored for cards, and powerful text formatting tools.
+
+## Demo
+
+A complete demo project is available in the [`Demo-Deck`](Demo-Deck) directory. It demonstrates how to create various types of cards and how to use the export system.
+
+## Measure System
+
+When designing cards for print, standard `dp` or `sp` units can be confusing. Card Composer uses a system where **1 dp = 1 sp = 1 pt** (PostScript point, 1/72 inch).
+
+To make it easier to work with physical dimensions, several extension properties are provided in `fr.sb.card_composer.Units`:
+
+- `.mm`: Converts millimeters to points.
+- `.inch`: Converts inches to points.
+- `.pt`: Explicitly uses points.
+
+Example:
+```kotlin
+val cardWidth = 63.mm
+val margin = 0.25.inch
+```
+
+## Creating and Organizing Cards
+
+Cards are defined using the `Card` data class. Each card has a name, a size, a theme, a back, and an optional group.
+
+```kotlin
+val myCard = Card(
+    size = CardSize.Poker.portrait,
+    theme = myTheme,
+    name = "Fireball",
+    group = "Spells",
+    back = Card.Back(
+        id = "spell-back",
+        content = { SpellBackContent() }
+    ),
+    front = { SpellFrontContent() }
+)
+```
+
+### Organizing with Groups
+The `group` property is used by exporters to organize files. For example, the PNG exporter will create a sub-directory for each group, keeping your exported card faces neatly organized.
+
+For the PDF exporter, all cards of a given group must be of the same size and orientation.
+
+## Theming: Use CardTheme instead of Material
+
+While you *can* use Material Design components, they are often not suited for game card design. Card Composer provides a dedicated `CardTheme` that focuses on card backgrounds and base text styles.
+
+Avoid using `MaterialTheme` as it brings in many defaults (like primary colors and typography) that might interfere with your card's look. Instead, use `CardTheme.current` to access your card's specific theme properties.
+
+```kotlin
+val customTheme = CardTheme(
+    cardBackground = Color.White,
+    textStyle = TextStyle(fontFamily = myFont, fontSize = 10.pt)
+)
+
+// In your card content:
+Box(Modifier.background(CardTheme.current.cardBackground)) {
+    Text("Hello", style = CardTheme.current.textStyle)
+}
+```
+
+## Card Back ID and PNG Export
+
+The `Card.Back` class has an `id` property. This ID is crucial when exporting to PNG:
+
+1. **If `id` is null**: The exporter assumes this card has a unique back. It will export it as `CardName - Back.png`.
+2. **If `id` is provided**: The exporter treats it as a shared back. It will export only one file named `Back - {id}.png` for all cards sharing that same ID. This is much more efficient for professional printing services where many cards share the same back design.
+
+## FormattedText
+
+The `FormattedText` utility allows you to use a simple tag-based syntax for rich text within your cards.
+
+### Syntax
+- **Styles**: `<b>Bold</b>`, `<i>Italics</i>`, `<s>Strikethrough</s>`.
+- **Custom Styles**: `<myStyle>Custom</myStyle>` (requires configuration in `TextFormatter`).
+- **Unicode**: `<#2665>` (Inserts ♥).
+- **Inline Content**: `<!icon_id>` (Inserts a Composable placeholder).
+- **Closing tags**: `<//>` closes the last opened tag, `</*>` closes all tags.
+
+### Usage
+```kotlin
+val formatter = TextFormatter()
+Text(formatter.formatted("This is <b>bold</b> and this is <#2665>."))
+```
+
+## Safe Margins and Content Padding
+
+When printing cards, you must account for "bleed" (extra area that will be cut) and "safe zones" (area where important content should stay).
+
+- **Safe Margin**: `CardSize.standardSafeMargin` is set to **3.18mm** (approx. 1/8 inch). This is the standard bleed/margin used by many professional printers.
+- **Full Size**: `CardSize.fullSize(size)` calculates the total dimensions including the safe margins on all sides.
+- **Safe Padding**: `CardSize.safePadding` (which is `standardSafeMargin * 2`) is a recommended padding to keep text and icons away from the cut line.
+
+It is highly recommended to wrap your card content in a `Box` with safe padding:
+
+```kotlin
+Card(
+    front = {
+        Box(Modifier.padding(CardSize.safePadding)) {
+            // Your important content here
+        }
+    }
+)
+```
