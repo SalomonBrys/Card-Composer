@@ -2,6 +2,56 @@
 
 Card Composer is a library for creating and printing board game cards using Compose Desktop. It provides a specialized unit system for physical printing, a theme system tailored for cards, and powerful text formatting tools.
 
+## Getting Started
+
+Card Composer is a side project and is **not published to Maven Central**. You can use it in your project in one of two ways:
+
+### Using GitHub Packages
+
+To use Card Composer via GitHub Packages, add the repository and the dependency to your `build.gradle.kts`:
+
+```kotlin
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/salomonbrys/card-composer")
+        credentials {
+            username = "YOUR_GITHUB_USERNAME"
+            password = "YOUR_GITHUB_TOKEN" // A classic Personal Access Token with 'read:packages' scope
+        }
+    }
+}
+
+dependencies {
+    implementation("fr.sb.card-composition:card-composer:1.0.0")
+}
+```
+
+### Building Locally
+
+If you prefer not to use GitHub Packages, you can clone the repository and install it to your local Maven repository:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/salomonbrys/Card-Composer.git
+   ```
+2. Navigate to the directory and run the publish task:
+   ```bash
+   cd Card-Composer
+   ./gradlew publishToMavenLocal
+   ```
+3. In your own project's `build.gradle.kts`, ensure you have `mavenLocal()` in your repositories and add the dependency:
+
+```kotlin
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation("fr.sb.card-composition:card-composer:1.0.0")
+}
+```
+
 ## Demo
 
 A complete demo project is available in the [`Demo-Deck`](Demo-Deck) directory. It demonstrates how to create various types of cards and how to use the export system.
