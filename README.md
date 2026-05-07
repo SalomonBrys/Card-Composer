@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation("fr.sb.card-composition:card-composer:1.0.0")
+    implementation("fr.sb.card-composition:card-composer:{VERSION}")
 }
 ```
 
@@ -37,7 +37,7 @@ If you prefer not to use GitHub Packages, you can clone the repository and insta
 2. Navigate to the directory and run the publish task:
    ```bash
    cd Card-Composer
-   ./gradlew publishToMavenLocal
+   ./gradlew card-composer:publishToMavenLocal
    ```
 3. In your own project's `build.gradle.kts`, ensure you have `mavenLocal()` in your repositories and add the dependency:
 
@@ -48,7 +48,7 @@ repositories {
 }
 
 dependencies {
-    implementation("fr.sb.card-composition:card-composer:1.0.0")
+    implementation("fr.sb.card-composition:card-composer:{VERSION}")
 }
 ```
 

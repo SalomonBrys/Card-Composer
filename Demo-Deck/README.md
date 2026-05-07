@@ -39,5 +39,5 @@ To generate your own printable PDF or PNG files of this deck, follow these steps
 
 3. **Export the cards**:
    - Once the app is running, click on the **export button** (located in the top right corner).
-   - Configure your export settings (format, cards, etc.) to your liking.
+   - Configure your export settings (paper format, cards, etc.) to your liking.
    - Enjoy your new printable deck!

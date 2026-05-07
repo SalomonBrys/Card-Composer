@@ -30,6 +30,7 @@ import fr.sb.card_composer.PtSize
 import fr.sb.card_composer.backFace
 import fr.sb.card_composer.frontFace
 import fr.sb.card_composer.fullName
+import fr.sb.card_composer.inch
 import fr.sb.card_composer.mm
 import fr.sb.card_composer.pt
 import kotlinx.coroutines.Deferred
@@ -55,27 +56,36 @@ import kotlin.math.floor
 internal object PdfExporter : Exporter {
     override val name: String get() = "PDF"
 
-    private var orientation: Orientation by mutableStateOf(Orientation.PORTRAIT)
+    enum class Format(val size: PtSize) {
+        A5(PtSize(148.mm, 210.mm)),
+        A4(PtSize(210.mm, 297.mm)),
+        A3(PtSize(297.mm, 420.mm)),
+        Letter(PtSize(8.5.inch, 11.inch)),
+        Legal(PtSize(8.5.inch, 14.inch)),
+        Tabloid(PtSize(11.inch, 17.inch)),
+    }
+    private var format: Format by mutableStateOf(Format.A4)
+
+    enum class Orientation { Portrait, Landscape }
+    private var orientation: Orientation by mutableStateOf(Orientation.Portrait)
 
     private var withBacks by mutableStateOf(true)
     private var forcePageOrientation by mutableStateOf(false)
 
-    enum class Orientation { PORTRAIT, LANDSCAPE }
-
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun ColumnScope.Config() {
-        var expanded by remember { mutableStateOf(false) }
+        var formatExpanded by remember { mutableStateOf(false) }
         ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
+            expanded = formatExpanded,
+            onExpandedChange = { formatExpanded = it },
             modifier = Modifier.width(160.dp)
         ) {
             OutlinedTextField(
-                value = orientation.name.lowercase().replaceFirstChar { it.uppercase() } ,
+                value = format.name,
                 onValueChange = {},
                 readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = formatExpanded) },
                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
                 singleLine = true,
                 modifier = Modifier
@@ -83,21 +93,87 @@ internal object PdfExporter : Exporter {
                     .pointerHoverIcon(PointerIcon.Default, true)
             )
             ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
+                expanded = formatExpanded,
+                onDismissRequest = { formatExpanded = false },
+            ) {
+                DropdownMenuItem(
+                    text = { Text("A5") },
+                    onClick = {
+                        format = Format.A5
+                        formatExpanded = false
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text("A4") },
+                    onClick = {
+                        format = Format.A4
+                        formatExpanded = false
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text("A3") },
+                    onClick = {
+                        format = Format.A3
+                        formatExpanded = false
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text("US Letter") },
+                    onClick = {
+                        format = Format.Letter
+                        formatExpanded = false
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text("US Legal") },
+                    onClick = {
+                        format = Format.Legal
+                        formatExpanded = false
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text("US Tabloid") },
+                    onClick = {
+                        format = Format.Tabloid
+                        formatExpanded = false
+                    },
+                )
+            }
+        }
+
+        var orientationExpanded by remember { mutableStateOf(false) }
+        ExposedDropdownMenuBox(
+            expanded = orientationExpanded,
+            onExpandedChange = { orientationExpanded = it },
+            modifier = Modifier.width(160.dp)
+        ) {
+            OutlinedTextField(
+                value = orientation.name,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = orientationExpanded) },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                singleLine = true,
+                modifier = Modifier
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                    .pointerHoverIcon(PointerIcon.Default, true)
+            )
+            ExposedDropdownMenu(
+                expanded = orientationExpanded,
+                onDismissRequest = { orientationExpanded = false },
             ) {
                 DropdownMenuItem(
                     text = { Text("Portrait") },
                     onClick = {
-                        orientation = Orientation.PORTRAIT
-                        expanded = false
+                        orientation = Orientation.Portrait
+                        orientationExpanded = false
                     },
                 )
                 DropdownMenuItem(
                     text = { Text("Landscape") },
                     onClick = {
-                        orientation = Orientation.LANDSCAPE
-                        expanded = false
+                        orientation = Orientation.Landscape
+                        orientationExpanded = false
                     },
                 )
             }
@@ -125,7 +201,6 @@ internal object PdfExporter : Exporter {
 
     }
 
-    private val a4Size = PtSize(210.mm, 297.mm)
     private val margin = 5.mm
 
     override fun export(cards: List<Card>): Flow<Exporter.Progress> =
@@ -156,12 +231,12 @@ internal object PdfExporter : Exporter {
     ): Flow<Exporter.Progress> =
         flow {
             val pageSize = when (orientation) {
-                Orientation.PORTRAIT -> a4Size
-                Orientation.LANDSCAPE -> PtSize(a4Size.height, a4Size.width)
+                Orientation.Portrait -> format.size
+                Orientation.Landscape -> PtSize(format.size.height, format.size.width)
             }
             val pageSafeSize = PtSize(pageSize.width - margin * 2, pageSize.height - margin * 2)
             val originalCardSize = cards.first().size
-            val originalCardOrientation = if (CardSize.isPortrait(originalCardSize)) Orientation.PORTRAIT else Orientation.LANDSCAPE
+            val originalCardOrientation = if (CardSize.isPortrait(originalCardSize)) Orientation.Portrait else Orientation.Landscape
             val rotate = forcePageOrientation && (orientation != originalCardOrientation)
             val cardSize =
                 if (rotate) PtSize(originalCardSize.height, originalCardSize.width)
