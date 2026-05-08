@@ -50,9 +50,7 @@ val cardBack = Card.Back(
                             text = suit.symbol,
                             color = suit.color,
                             fontSize = 48.sp,
-                            style = CardTheme.current.textStyle.copy(
-                                drawStyle = Stroke(with(density) { .2.mm.toPx() })
-                            )
+                            drawStyle = Stroke(with(density) { .2.mm.toPx() }),
                         )
                     }
                 }

@@ -75,7 +75,7 @@ internal fun CardPreview(
                         content = face.content,
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(CardTheme.current.cardBackground)
+                            .background(CardTheme.cardBackground)
                             .drawWithContent {
                                 drawContent()
                                 if (!showSafeArea) return@drawWithContent

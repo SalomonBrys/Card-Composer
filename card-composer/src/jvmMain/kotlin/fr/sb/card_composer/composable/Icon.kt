@@ -21,7 +21,7 @@ import fr.sb.card_composer.CardTheme
 @Composable
 private fun Modifier.defaultSizeFor(painter: Painter): Modifier {
     val density = LocalDensity.current
-    val fontSize = CardTheme.current.textStyle.fontSize
+    val fontSize = CardTheme.textStyle.fontSize
     return this.then(
         if (fontSize.isSp) {
             Modifier.size(with(density) { fontSize.toDp() })
@@ -35,7 +35,7 @@ private fun Modifier.defaultSizeFor(painter: Painter): Modifier {
 public fun Icon(
     icon: ImageVector,
     modifier: Modifier = Modifier,
-    tint: Color = CardTheme.current.textStyle.color,
+    tint: Color = CardTheme.textStyle.color,
 ) {
     Icon(
         painter = rememberVectorPainter(icon),
@@ -48,7 +48,7 @@ public fun Icon(
 public fun Icon(
     painter: Painter,
     modifier: Modifier = Modifier,
-    tint: Color = CardTheme.current.textStyle.color,
+    tint: Color = CardTheme.textStyle.color,
 ) {
     val colorFilter =
         remember(tint) { if (tint == Color.Unspecified) null else ColorFilter.tint(tint) }

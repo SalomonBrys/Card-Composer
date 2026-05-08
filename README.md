@@ -109,7 +109,7 @@ val customTheme = CardTheme(
 
 // In your card content:
 Box(Modifier.background(CardTheme.current.cardBackground)) {
-    Text("Hello", style = CardTheme.current.textStyle)
+    Text("Hello") // This is fr.sb.card_composer.composable.Text, which uses CardTheme.current.textStyle as default.
 }
 ```
 

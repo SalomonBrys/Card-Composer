@@ -179,7 +179,7 @@ internal object PngExporter : Exporter {
                 Box(
                     Modifier
                         .fillMaxSize()
-                        .background(CardTheme.current.cardBackground)
+                        .background(CardTheme.cardBackground)
                 ) {
                     face.content(this)
                 }

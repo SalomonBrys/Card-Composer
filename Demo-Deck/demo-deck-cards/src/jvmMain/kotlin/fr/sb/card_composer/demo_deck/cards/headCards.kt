@@ -7,6 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.TextStyle
 import demo_deck.demo_deck_cards.generated.resources.Res
 import demo_deck.demo_deck_cards.generated.resources.head_j
 import demo_deck.demo_deck_cards.generated.resources.head_k
@@ -26,8 +27,8 @@ fun headCards(): List<Card> = Suits.entries.flatMap { suit ->
     ).map { (value, drawable) ->
         Card(
             size = cardSize.portrait,
-            theme = theme.copy(
-                textStyle = theme.textStyle.copy(color = suit.color)
+            theme = theme.merge(
+                textStyle = TextStyle(color = suit.color)
             ),
             group = "Heads",
             name = "${suit.symbol}${value}",

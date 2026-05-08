@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import fr.sb.card_composer.Card
 import fr.sb.card_composer.CardTheme
@@ -20,8 +21,8 @@ import fr.sb.card_composer.demo_deck.widget.SuitedCorner
 fun aceCards() = Suits.entries.map { suit ->
     Card(
         size = cardSize.portrait,
-        theme = theme.copy(
-            textStyle = theme.textStyle.copy(color = suit.color)
+        theme = theme.merge(
+            textStyle = TextStyle(color = suit.color)
         ),
         group = "Aces",
         name = "${suit.symbol}A",
@@ -46,9 +47,7 @@ fun aceCards() = Suits.entries.map { suit ->
             Text(
                 text = suit.symbol,
                 fontSize = 128.sp,
-                style = CardTheme.current.textStyle.copy(
-                    drawStyle = Stroke(with(density) { .1.mm.toPx() })
-                )
+                drawStyle = Stroke(with(density) { .1.mm.toPx() }),
             )
         }
         listOf(

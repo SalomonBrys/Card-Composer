@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -38,10 +39,8 @@ import fr.sb.card_composer.demo_deck.widget.HorizontallyHatched
 import org.jetbrains.compose.resources.imageResource
 
 fun tichuCards(): List<Card> {
-    val tichuTheme = theme.copy(
-        textStyle = theme.textStyle.copy(
-            color = Color.Black,
-        )
+    val tichuTheme = theme.merge(
+        textStyle = TextStyle(color = Color.Black)
     )
     return listOf(
         Card(
@@ -72,9 +71,7 @@ fun tichuCards(): List<Card> {
                     text = "1",
                     fontSize = 128.sp,
                     fontWeight = FontWeight.Black,
-                    style = CardTheme.current.textStyle.copy(
-                        drawStyle = Stroke(with(density) { .1.mm.toPx() })
-                    )
+                    drawStyle = Stroke(with(density) { .1.mm.toPx() }),
                 )
             }
             listOf(
@@ -110,7 +107,7 @@ fun tichuCards(): List<Card> {
             Image(
                 bitmap = imageResource(drawable),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(CardTheme.current.textStyle.color),
+                colorFilter = ColorFilter.tint(CardTheme.textStyle.color),
                 modifier = Modifier
                     .align(Alignment.Center)
                     .fillMaxHeight(.9f)
@@ -124,7 +121,6 @@ fun tichuCards(): List<Card> {
             ).forEach {
                 Icon(
                     icon = icon,
-                    tint = CardTheme.current.textStyle.color,
                     modifier = it
                         .padding(CardSize.safePadding)
                         .padding(top = 1.mm)
