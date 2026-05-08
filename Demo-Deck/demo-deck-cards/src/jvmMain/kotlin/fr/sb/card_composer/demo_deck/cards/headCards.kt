@@ -1,6 +1,5 @@
 package fr.sb.card_composer.demo_deck.cards
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Alignment
@@ -8,23 +7,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
-import demo_deck.demo_deck_cards.generated.resources.Res
-import demo_deck.demo_deck_cards.generated.resources.head_j
-import demo_deck.demo_deck_cards.generated.resources.head_k
-import demo_deck.demo_deck_cards.generated.resources.head_q
 import fr.sb.card_composer.Card
+import fr.sb.card_composer.composable.Image
 import fr.sb.card_composer.demo_deck.Suits
 import fr.sb.card_composer.demo_deck.cardSize
 import fr.sb.card_composer.demo_deck.theme
 import fr.sb.card_composer.demo_deck.widget.SuitedCorner
-import org.jetbrains.compose.resources.imageResource
+import kotlin.io.path.Path
+
 
 fun headCards(): List<Card> = Suits.entries.flatMap { suit ->
-    listOf(
-        "J" to Res.drawable.head_j,
-        "Q" to Res.drawable.head_q,
-        "K" to Res.drawable.head_k,
-    ).map { (value, drawable) ->
+    listOf("J", "Q", "K").map { value ->
         Card(
             size = cardSize.portrait,
             theme = theme.merge(
@@ -35,8 +28,7 @@ fun headCards(): List<Card> = Suits.entries.flatMap { suit ->
             back = cardBack,
         ) {
             Image(
-                bitmap = imageResource(drawable),
-                contentDescription = null,
+                path = Path("assets/images/Heads/${value}.png"),
                 colorFilter = ColorFilter.tint(color = suit.color),
                 modifier = Modifier
                     .align(Alignment.Center)

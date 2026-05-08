@@ -1,6 +1,5 @@
 package fr.sb.card_composer.demo_deck.cards
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,16 +16,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
-import demo_deck.demo_deck_cards.generated.resources.Res
-import demo_deck.demo_deck_cards.generated.resources.joker
 import fr.sb.card_composer.Card
 import fr.sb.card_composer.CardSize
 import fr.sb.card_composer.composable.Icon
-import fr.sb.card_composer.mm
+import fr.sb.card_composer.composable.Image
 import fr.sb.card_composer.demo_deck.Suits
 import fr.sb.card_composer.demo_deck.cardSize
 import fr.sb.card_composer.demo_deck.theme
-import org.jetbrains.compose.resources.imageResource
+import fr.sb.card_composer.mm
+import kotlin.io.path.Path
 
 fun jokerCards() =
     listOf(
@@ -50,8 +48,7 @@ fun jokerCards() =
             back = cardBack,
         ) {
             Image(
-                bitmap = imageResource(Res.drawable.joker),
-                contentDescription = null,
+                path = Path("assets/images/Joker.png"),
                 modifier = Modifier
                     .align(Alignment.Center)
                     .fillMaxHeight(.6f)

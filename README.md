@@ -137,6 +137,32 @@ val formatter = TextFormatter()
 Text(formatter.formatted("This is <b>bold</b> and this is <#2665>."))
 ```
 
+## Images
+
+It is highly recommended to use `fr.sb.card_composer.composable.Image` rather than `androidx.compose.foundation.Image` for several reasons:
+
+- **No `contentDescription`**: Since this library is focused on print, accessibility descriptions are not required.
+- **High Quality**: `filterQuality` is set to `FilterQuality.High` by default, which is essential for high-quality print output.
+
+### Image Sources
+
+You can display images from two main sources:
+
+- **Compose Resources**: Use standard Compose resources.
+- **External Files**: Use `java.nio.file.Path` to load images from the file system.
+
+### SVG Support
+
+SVG files are supported when loaded as **external files** (via `Path`). However, they are **not supported** when used as Compose resources.
+
+```kotlin
+// Loading an image from a path
+Image(Path("path/to/image.png"))
+
+// Loading an SVG from a path
+Image(Path("path/to/illustration.svg"))
+```
+
 ## Safe Margins and Content Padding
 
 When printing cards, you must account for "bleed" (extra area that will be cut) and "safe zones" (area where important content should stay).

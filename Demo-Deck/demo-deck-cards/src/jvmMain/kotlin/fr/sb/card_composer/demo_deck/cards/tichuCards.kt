@@ -1,6 +1,5 @@
 package fr.sb.card_composer.demo_deck.cards
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,20 +22,17 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import demo_deck.demo_deck_cards.generated.resources.Res
-import demo_deck.demo_deck_cards.generated.resources.tichu_dog
-import demo_deck.demo_deck_cards.generated.resources.tichu_dragon
-import demo_deck.demo_deck_cards.generated.resources.tichu_phoenix
 import fr.sb.card_composer.Card
 import fr.sb.card_composer.CardSize
 import fr.sb.card_composer.CardTheme
 import fr.sb.card_composer.composable.Icon
+import fr.sb.card_composer.composable.Image
 import fr.sb.card_composer.composable.Text
-import fr.sb.card_composer.mm
 import fr.sb.card_composer.demo_deck.cardSize
 import fr.sb.card_composer.demo_deck.theme
 import fr.sb.card_composer.demo_deck.widget.HorizontallyHatched
-import org.jetbrains.compose.resources.imageResource
+import fr.sb.card_composer.mm
+import kotlin.io.path.Path
 
 fun tichuCards(): List<Card> {
     val tichuTheme = theme.merge(
@@ -93,10 +89,10 @@ fun tichuCards(): List<Card> {
             }
         }
     ) + listOf(
-        Triple("Dog", Icons.Rounded.Pets, Res.drawable.tichu_dog),
-        Triple("Phoenix", Icons.Rounded.AutoAwesome, Res.drawable.tichu_phoenix),
-        Triple("Dragon", Icons.Rounded.Whatshot, Res.drawable.tichu_dragon),
-    ).map { (name, icon, drawable) ->
+        "Dog" to Icons.Rounded.Pets,
+        "Phoenix" to Icons.Rounded.AutoAwesome,
+        "Dragon" to Icons.Rounded.Whatshot,
+    ).map { (name, icon) ->
         Card(
             size = cardSize.portrait,
             theme = tichuTheme,
@@ -105,8 +101,7 @@ fun tichuCards(): List<Card> {
             back = cardBack,
         ) {
             Image(
-                bitmap = imageResource(drawable),
-                contentDescription = null,
+                path = Path("assets/images/Tichu/${name}.png"),
                 colorFilter = ColorFilter.tint(CardTheme.textStyle.color),
                 modifier = Modifier
                     .align(Alignment.Center)

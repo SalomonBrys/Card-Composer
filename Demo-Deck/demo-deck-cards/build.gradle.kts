@@ -13,7 +13,6 @@ kotlin {
             implementation(libs.compose.foundation)
             implementation(libs.compose.ui)
             implementation(libs.compose.materialIcons)
-            implementation(libs.compose.components.resources)
 
             implementation("fr.sb.card-composition:card-composer")
         }
