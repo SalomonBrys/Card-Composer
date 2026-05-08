@@ -10,6 +10,7 @@ version = "1.2.0"
 
 kotlin {
     jvm()
+    jvmToolchain(17)
 
     explicitApi()
 

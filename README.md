@@ -113,6 +113,17 @@ Box(Modifier.background(CardTheme.current.cardBackground)) {
 }
 ```
 
+Note that, even though Material components are not declared as a dependency in `build.gradle.kts`, it will be in your classpath because of `compose.desktop.currentOs`.
+You should therefore declare the corresponding dependency as such:
+
+```kotlin
+jvmMain.dependencies {
+   implementation(compose.desktop.currentOs) {
+       exclude("org.jetbrains.compose.material")
+   }
+}
+```
+
 ## Card Back ID and PNG Export
 
 The `Card.Back` class has an `id` property. This ID is crucial when exporting to PNG:
