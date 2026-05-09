@@ -71,6 +71,7 @@ internal object PdfExporter : Exporter {
 
     private var withBacks by mutableStateOf(true)
     private var forcePageOrientation by mutableStateOf(false)
+    private var pixelPerInch by mutableStateOf("300")
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -179,6 +180,14 @@ internal object PdfExporter : Exporter {
             }
         }
 
+        OutlinedTextField(
+            value = pixelPerInch,
+            onValueChange = { pixelPerInch = it },
+            label = { Text("Pixel per inch") },
+            modifier = Modifier
+                .width(128.dp)
+        )
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -200,6 +209,8 @@ internal object PdfExporter : Exporter {
         }
 
     }
+
+    override fun isConfigValid(): Boolean = pixelPerInch.toIntOrNull()?.takeIf { it > 0 } != null
 
     private val margin = 5.mm
 
@@ -331,10 +342,11 @@ internal object PdfExporter : Exporter {
                         Render(
                             name = name,
                             png = async(Dispatchers.Default) {
-                                PngExporter.renderCardFaceBitmap(
+                                renderCardFaceBitmap(
                                     face = face,
                                     bleed = bleed,
                                     rotation = rotation,
+                                    pixelPerInch = pixelPerInch.toInt(),
                                 )
                             },
                             bleed = bleed,

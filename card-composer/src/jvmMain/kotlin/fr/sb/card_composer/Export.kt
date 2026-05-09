@@ -130,7 +130,7 @@ internal fun Export(
                                     progress = null
                                 }
                             },
-                            enabled = selected.isNotEmpty(),
+                            enabled = selected.isNotEmpty() && exporter.isConfigValid(),
                         ) {
                             Text("Export")
                         }
